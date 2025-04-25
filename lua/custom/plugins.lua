@@ -5,6 +5,22 @@ local plugins = {
     lazy = false,
   },
   
+  -- Required for many plugins
+  {
+    "MunifTanjim/nui.nvim",
+    lazy = false, -- Set to false to ensure it loads before dependent plugins
+  },
+  
+  -- Context commentstring for proper comments in different languages
+  {
+    "JoosepAlviste/nvim-ts-context-commentstring",
+    config = function()
+      require('ts_context_commentstring').setup {}
+      -- Speed up loading
+      vim.g.skip_ts_context_commentstring_module = true
+    end
+  },
+  
   -- Mason for LSP, DAP, Linter, Formatter
   {
     "williamboman/mason.nvim",
@@ -55,10 +71,10 @@ local plugins = {
     dependencies = {
       "williamboman/mason.nvim",
       "williamboman/mason-lspconfig.nvim",
+      "hrsh7th/cmp-nvim-lsp",
     },
     config = function()
-      require "plugins.configs.lspconfig" -- Use NvChad's default lspconfig
-      require "custom.configs.lspconfig" -- Your custom LSP settings
+      require "custom.configs.lspconfig" -- Use our custom LSP config
     end,
   },
   
@@ -122,23 +138,61 @@ local plugins = {
     "nvim-telescope/telescope.nvim",
     dependencies = {
       "nvim-lua/plenary.nvim",
-      "nvim-telescope/telescope-fzf-native.nvim",
+      { "nvim-telescope/telescope-fzf-native.nvim", build = "make" },
       "nvim-telescope/telescope-file-browser.nvim",
       "nvim-telescope/telescope-project.nvim",
-      "nvim-telescope/telescope-media-files.nvim",
       "nvim-telescope/telescope-ui-select.nvim",
     },
     cmd = "Telescope",
+    keys = {
+      { "<leader>ff", desc = "Find files" },
+      { "<leader>fg", desc = "Live grep" },
+      { "<leader>fb", desc = "Buffers" },
+      { "<leader>fe", desc = "File browser" },
+      { "<leader>fn", desc = "Browse current directory" },
+      { "<leader>fo", desc = "Recent files" },
+      { "<leader>fr", desc = "LSP references" },
+      { "<leader>fd", desc = "Document diagnostics" },
+      { "<leader>fD", desc = "Workspace diagnostics" },
+      { "<leader>ds", desc = "Document symbols" },
+      { "<leader>ws", desc = "Workspace symbols" },
+      { "<C-f>", desc = "Search in current buffer" },
+    },
     config = function()
-      local telescope = require("telescope")
-      telescope.setup(require("custom.configs.telescope"))
+      require("telescope").setup({
+        defaults = {
+          mappings = {
+            i = {
+              ["<C-j>"] = "move_selection_next",
+              ["<C-k>"] = "move_selection_previous",
+            },
+          },
+        },
+        pickers = {
+          find_files = {
+            hidden = true,
+          },
+        },
+        extensions = {
+          fzf = {
+            fuzzy = true,
+            override_generic_sorter = true,
+            override_file_sorter = true,
+            case_mode = "smart_case",
+          },
+        },
+      })
       
       -- Load extensions
-      telescope.load_extension("fzf")
-      telescope.load_extension("file_browser")
-      telescope.load_extension("project")
-      telescope.load_extension("media_files")
-      telescope.load_extension("ui-select")
+      require("telescope").load_extension("fzf")
+      local has_fb, _ = pcall(require, "telescope._extensions.file_browser")
+      if has_fb then
+        require("telescope").load_extension("file_browser")
+      end
+      local has_ui_select, _ = pcall(require, "telescope._extensions.ui-select")
+      if has_ui_select then
+        require("telescope").load_extension("ui-select")
+      end
     end,
   },
   
@@ -159,7 +213,28 @@ local plugins = {
     "nvim-tree/nvim-tree.lua",
     cmd = { "NvimTreeToggle", "NvimTreeFocus" },
     config = function()
-      require("nvim-tree").setup(require("custom.configs.nvimtree"))
+      require("nvim-tree").setup({
+        filters = {
+          dotfiles = false,
+        },
+        disable_netrw = true,
+        hijack_netrw = true,
+        view = {
+          width = 30,
+        },
+        git = {
+          enable = true,
+          ignore = false,
+        },
+        renderer = {
+          highlight_git = true,
+          icons = {
+            show = {
+              git = true,
+            },
+          },
+        },
+      })
     end,
   },
   
@@ -184,7 +259,8 @@ local plugins = {
         highlight = { enable = true },
         indent = { enable = true },
         autotag = { enable = true },
-        context_commentstring = { enable = true, enable_autocmd = false },
+        -- Use the standalone setup instead of the module
+        context_commentstring = { enable = false },
         incremental_selection = {
           enable = true,
           keymaps = {
@@ -443,6 +519,13 @@ local plugins = {
     "yetone/avante.nvim",
     event = "VeryLazy",
     version = false, 
+    dependencies = {
+      "MunifTanjim/nui.nvim", -- Ensure nui.nvim is loaded first
+      "nvim-lua/plenary.nvim",
+      "stevearc/dressing.nvim",
+      "nvim-telescope/telescope.nvim",
+      "hrsh7th/nvim-cmp",
+    },
     opts = {
       provider = "claude",
       auto_suggestions_provider = "claude",
@@ -541,37 +624,6 @@ local plugins = {
       },
     },
     build = "make",
-    dependencies = {
-      "stevearc/dressing.nvim",
-      "nvim-lua/plenary.nvim",
-      "MunifTanjim/nui.nvim",
-      "echasnovski/mini.pick",
-      "nvim-telescope/telescope.nvim",
-      "hrsh7th/nvim-cmp",
-      "ibhagwan/fzf-lua",
-      "nvim-tree/nvim-web-devicons",
-      {
-        "HakonHarnes/img-clip.nvim",
-        event = "VeryLazy",
-        opts = {
-          default = {
-            embed_image_as_base64 = false,
-            prompt_for_file_name = false,
-            drag_and_drop = {
-              insert_mode = true,
-            },
-            use_absolute_path = true,
-          },
-        },
-      },
-      {
-        'MeanderingProgrammer/render-markdown.nvim',
-        opts = {
-          file_types = { "markdown", "Avante" },
-        },
-        ft = { "markdown", "Avante" },
-      },
-    },
   },
   
   -- ==================== Other Tools ====================
@@ -620,6 +672,65 @@ local plugins = {
     event = "VeryLazy",
     config = function()
       require("nvim-surround").setup()
+    end,
+  },
+  
+  -- Which-key for key binding hints
+  {
+    "folke/which-key.nvim",
+    event = "VeryLazy",
+    init = function()
+      vim.o.timeout = true
+      vim.o.timeoutlen = 300
+    end,
+    config = function()
+      require("which-key").setup({
+        plugins = {
+          marks = true,
+          registers = true,
+          spelling = {
+            enabled = false,
+          },
+          presets = {
+            operators = true,
+            motions = true,
+            text_objects = true,
+            windows = true,
+            nav = true,
+            z = true,
+            g = true,
+          },
+        },
+        icons = {
+          breadcrumb = "»",
+          separator = "➜",
+          group = "+",
+        },
+        window = {
+          border = "rounded",
+          position = "bottom",
+          margin = { 1, 0, 1, 0 },
+          padding = { 2, 2, 2, 2 },
+        },
+        layout = {
+          height = { min = 4, max = 25 },
+          width = { min = 20, max = 50 },
+          spacing = 3,
+          align = "center",
+        },
+      })
+      
+      -- Register key groups
+      local wk = require("which-key")
+      wk.register({
+        f = { name = "Find" },
+        g = { name = "Git/Go To" },
+        d = { name = "Document" },
+        w = { name = "Workspace" },
+        p = { name = "Packages" },
+        s = { name = "Split" },
+        a = { name = "AI" },
+      }, { prefix = "<leader>" })
     end,
   },
 }

@@ -1,35 +1,18 @@
+-- Default NvChad plugins
 return {
-  {
-    "stevearc/conform.nvim",
-    -- event = 'BufWritePre', -- uncomment for format on save
-    opts = require "configs.conform",
-  },
-
-  -- These are some examples, uncomment them if you want to see them work!
   {
     "neovim/nvim-lspconfig",
     config = function()
-      require "configs.lspconfig"
+      require("configs.lspconfig") -- This will load our bridge file
     end,
   },
 
-  -- GitHub Copilot
-  {
-    "github/copilot.vim",
-    cmd = "Copilot",
-    event = "InsertEnter",
-  },
-
-  -- test new blink
-  -- { import = "nvchad.blink.lazyspec" },
-
-  -- {
-  -- 	"nvim-treesitter/nvim-treesitter",
-  -- 	opts = {
-  -- 		ensure_installed = {
-  -- 			"vim", "lua", "vimdoc",
-  --      "html", "css"
-  -- 		},
-  -- 	},
-  -- },
+  -- Default plugins that come with NvChad
+  "nvim-treesitter/nvim-treesitter",
+  "nvim-lua/plenary.nvim",
+  "nvim-tree/nvim-web-devicons",
+  "MunifTanjim/nui.nvim",
+  
+  -- Load our custom plugins
+  { import = "custom.plugins" },
 }

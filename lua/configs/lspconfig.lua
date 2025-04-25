@@ -1,4 +1,2 @@
-require("nvchad.configs.lspconfig").defaults()
-
-local servers = { "html", "cssls" }
-vim.lsp.enable(servers)
+-- Bridge file to load the custom LSP configuration
+return require("custom.configs.lspconfig")

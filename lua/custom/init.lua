@@ -1,6 +1,14 @@
 -- Custom init.lua for NvChad
 -- Migrated from realbackup_nvim configuration
 
+-- Check if nui.nvim is installed and available
+local function ensure_nui()
+  local has_nui, _ = pcall(require, "nui.split")
+  if not has_nui then
+    vim.notify("nui.nvim is not installed or not loaded properly. Some features may not work.", vim.log.levels.WARN)
+  end
+end
+
 -- Basic additional Neovim configurations
 local opt = vim.opt
 local g = vim.g
@@ -58,6 +66,22 @@ opt.splitright = true       -- Vertical splits will automatically be to the righ
 -- Preview settings for grep and search
 opt.grepprg = "rg --vimgrep --no-heading --smart-case"
 opt.grepformat = "%f:%l:%c:%m,%f:%l:%m"
+
+-- Create bridge files if needed
+if not vim.loop.fs_stat(vim.fn.stdpath("config") .. "/lua/nvchad/configs/lspconfig.lua") then
+  -- Create bridge file content
+  local bridge_content = "-- Bridge file to load custom lspconfig\nreturn require('custom.configs.lspconfig')"
+  
+  -- Make sure the directory exists
+  vim.fn.mkdir(vim.fn.stdpath("config") .. "/lua/nvchad/configs", "p")
+  
+  -- Write the bridge file
+  local file = io.open(vim.fn.stdpath("config") .. "/lua/nvchad/configs/lspconfig.lua", "w")
+  if file then
+    file:write(bridge_content)
+    file:close()
+  end
+end
 
 -- Avante keymaps
 local keymap = vim.keymap
@@ -125,3 +149,6 @@ autocmd("VimResized", {
   end,
   group = preview_group,
 })
+
+-- Call this at the end to ensure nui.nvim is available for Avante
+ensure_nui()
