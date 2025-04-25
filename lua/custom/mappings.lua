@@ -11,6 +11,10 @@ M.general = {
     -- Buffer management
     ["<leader>x"] = { "<cmd>bd<CR>", "Close buffer" },
     ["<leader>n"] = { "<cmd>enew<CR>", "New buffer" },
+    
+    -- Theme switching
+    ["<leader>tm"] = { "<cmd>lua require('material.functions').toggle_style()<CR>", "Toggle Material theme style" },
+    ["<leader>tt"] = { "<cmd>lua require('nvchad.themes.toggle')()<CR>", "Toggle between themes" },
   },
 
   i = {

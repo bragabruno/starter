@@ -60,6 +60,18 @@ local plugins = {
     priority = 1000,
     opts = {},
   },
+  -- Moonlight theme
+  {
+    "shaunsingh/moonlight.nvim",
+    lazy = false,
+    priority = 1000,
+  },
+  -- Material theme
+  {
+    "marko-cerovac/material.nvim",
+    lazy = false,
+    priority = 1000,
+  },
   {
     "stevearc/dressing.nvim",
     event = "VeryLazy",
