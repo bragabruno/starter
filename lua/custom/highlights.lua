@@ -1,49 +1,19 @@
 -- To find any highlight groups: "<cmd> Telescope highlights"
 -- Each highlight group can take a table with variables fg, bg, bold, italic, etc
--- base30 variable names can also be used as colors
+-- local function add_hl(name, value)
+--   vim.api.nvim_set_hl(0, name, value)
+-- end
 
 local M = {}
 
 ---@type Base46HLGroupsList
 M.override = {
-  Comment = {
-    italic = true,
-  },
-  CursorLine = {
-    bg = "black2",
-  },
-  NvimTreeFolderName = {
-    bold = true,
-  },
-  NvimTreeOpenedFolderName = {
-    bold = true,
-    italic = true,
-  },
-  NvimTreeGitDirty = {
-    fg = "red",
-  },
-  NvimTreeGitNew = {
-    fg = "green",
-  },
-  NvimTreeGitStaged = {
-    fg = "vibrant_green",
-  },
-  NormalFloat = {
-    bg = "darker_black",
-  },
-  FloatBorder = {
-    fg = "blue",
-    bg = "darker_black",
-  },
+  -- Add highlight group overrides here
 }
 
 ---@type HLTable
 M.add = {
-  AvanteOutputBorder = { link = "FloatBorder" },
-  AvantePromptBorder = { link = "FloatBorder" },
-  FlutterToolsOutlineHighlight = { fg = "blue", bg = "one_bg" },
-  DartUnitTestSuccess = { fg = "green" },
-  DartUnitTestFailure = { fg = "red" },
+  -- Add new highlight groups here
 }
 
 return M
