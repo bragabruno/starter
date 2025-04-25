@@ -41,7 +41,7 @@ local options = {
       show = {
         file = true,
         folder = true,
-        folder_arrow = true,
+        folder_arrow = false, -- Disabled folder arrows
         git = true,
       },
       glyphs = {
@@ -54,8 +54,8 @@ local options = {
           open = "",
           symlink = "",
           symlink_open = "",
-          arrow_open = "",
-          arrow_closed = "",
+          arrow_open = "╴", -- Changed to a lighter line
+          arrow_closed = "┌", -- Changed to a lighter line
         },
         git = {
           unstaged = "✗",
